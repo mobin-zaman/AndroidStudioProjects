@@ -1,6 +1,8 @@
 package com.londonappbrewery.quizzler;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -13,7 +15,6 @@ public class MainActivity extends Activity {
 
     // TODO: Declare constants here
 
-    final int PROGRESS_BAR_INCREMENT = 8;
 
     // TODO: Declare member variables here:
     Button mTrueButton;
@@ -42,6 +43,7 @@ public class MainActivity extends Activity {
             new TrueFalse(R.string.question_13,true)
     };
 
+    final int PROGRESS_BAR_INCREMENT =(int) Math.ceil(100.0/mQuestionBank.length);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,8 +80,24 @@ public class MainActivity extends Activity {
     }
 
     private void updateQuestion(){
+
         mIndex=(mIndex+1)%mQuestionBank.length;
+
+        if(mIndex == 0){
+            AlertDialog.Builder alert=new AlertDialog.Builder(this);
+            alert.setTitle("Game over");
+            alert.setCancelable(false);
+            alert.setMessage("You scored "+ mScore + " points!");
+            alert.setPositiveButton("Close Application", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    finish();
+                }
+            });
+            alert.show();
+        }
         mQuestionTextView.setText(mQuestionBank[mIndex].getmQuestionID());
+        mProgressBar.incrementProgressBy(PROGRESS_BAR_INCREMENT);
     }
 
     private void checkAnswer(boolean userSelection){
@@ -87,6 +105,8 @@ public class MainActivity extends Activity {
 
         if(userSelection == correctAnswer){
             Toast.makeText(getApplicationContext(),R.string.correct_toast,Toast.LENGTH_SHORT).show();
+            mScore++;
+            mScoreTextView.setText("Score "+mScore+"/"+mQuestionBank.length);
         } else {
             Toast.makeText(getApplicationContext(),R.string.incorrect_toast,Toast.LENGTH_SHORT).show();
         }
